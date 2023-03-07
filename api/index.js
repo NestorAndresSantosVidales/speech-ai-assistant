@@ -100,9 +100,10 @@ async function getResponse(transcription) {
     messages: [{
       content: transcription,
       role: 'assistant'
-    }]
+    }],
+    max_tokens: 50
   });
-  
+
   return response.data.choices[0].message.content.trim();
 }
 
