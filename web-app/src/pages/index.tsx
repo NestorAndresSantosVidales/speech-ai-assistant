@@ -7,16 +7,16 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Tailwind CSS Center Image</title>
+        <title>RIC - AI Assitant (By ChatGPT)</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div className="flex items-center justify-center h-screen bg-black text-green-400 flex-col">
+      <div className="flex items-center justify-center h-screen flex-col bg-gradient-to-b from-slate-900 via-sky-800 to-slate-900">
         <main className="items-center flex justify-center w-full text-center flex-1">
           <VoiceRecorder></VoiceRecorder>
         </main>
         <footer className="py-8">
-          <h1 className="">AI Assistant with Chat GPT</h1>
+          <h1 className="text-slate-200">RIC - AI Assitant (By ChatGPT)</h1>
         </footer>
       </div>
     </>
