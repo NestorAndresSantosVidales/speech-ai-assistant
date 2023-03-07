@@ -11,7 +11,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div className="flex items-center justify-center h-screen flex-col bg-gradient-to-b from-slate-900 via-purple-900 to-slate-900">
+      <div className="flex items-center justify-center h-screen flex-col bg-gradient-to-b from-slate-900 via-sky-800 to-slate-900">
         <main className="items-center flex justify-center w-full text-center flex-1">
           <VoiceRecorder></VoiceRecorder>
         </main>

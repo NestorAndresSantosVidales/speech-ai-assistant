@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import TextToSpeech from "../TextToSpeech/TextToSpeech";
+import VoiceEffect from "../VoiceEffect/VoiceEffect";
 
 interface VoiceRecorderProps {}
 
@@ -61,6 +62,9 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = () => {
       }
     } catch (error) {
       console.error("Failed to send audio:", error);
+      setAnswer(
+        "Lo siento, no he podido establecer comunicación con el servidor."
+      );
     } finally {
       setProcessing(false);
     }
@@ -104,11 +108,11 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = () => {
     return (
       <button
         className={`p-4 rounded-full shadow-lg transition-all duration-500 w-64 h-64 ${
-          recording ? "bg-cyan-400 animate-pulse" : "bg-slate-300"
+          recording ? " bg-red-500" : "bg-slate-300"
         } hover:shadow-2xl hover:bg-opacity-80`}
         onClick={recording ? handleStopRecording : handleStartRecording}
       >
-        <span className="text-8xl">🎙</span>
+        <span className="text-8xl">{recording ? <VoiceEffect /> : "🎙"}</span>
       </button>
     );
   };
