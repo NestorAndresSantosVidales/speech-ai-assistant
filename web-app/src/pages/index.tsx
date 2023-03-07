@@ -11,12 +11,13 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div className="flex items-center justify-center h-screen bg-black text-green-400">
-        <main className="w-full text-center">
-          <h1 className="text-3xl">AI Assistant with Chat GPT</h1>
-
+      <div className="flex items-center justify-center h-screen bg-black text-green-400 flex-col">
+        <main className="items-center flex justify-center w-full text-center flex-1">
           <VoiceRecorder></VoiceRecorder>
         </main>
+        <footer className="py-8">
+          <h1 className="">AI Assistant with Chat GPT</h1>
+        </footer>
       </div>
     </>
   );
