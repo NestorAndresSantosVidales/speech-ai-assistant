@@ -95,14 +95,15 @@ app.post('/api/v1/google/chat', upload.single('audio'), async (req, res) => {
 async function getResponse(transcription) {
   console.log('Requesting the next question: ', transcription)
 
-  const response = await openai.createCompletion({
-    model: 'ada',
-    prompt: transcription,
-    "temperature": 0, 
-    "max_tokens": 30
+  const response = await openai.createChatCompletion({
+    model: "gpt-3.5-turbo",
+    messages: [{
+      content: transcription,
+      role: 'assistant'
+    }]
   });
   
-  return response.data.choices[0].text.trim();
+  return response.data.choices[0].message.content.trim();
 }
 
 // Start the server
