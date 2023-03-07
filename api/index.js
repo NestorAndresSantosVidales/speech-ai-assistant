@@ -1,31 +1,112 @@
 const express = require('express');
 const multer = require('multer');
+const axios = require('axios');
+const { SpeechClient } = require('@google-cloud/speech');
+const cors = require('cors');
+require('dotenv').config()
+
+const { Configuration, OpenAIApi } = require( "openai");
+const configuration = new Configuration({
+    apiKey: process.env.OPENAI_API_KEY,
+});
+const openai = new OpenAIApi(configuration);
 
 const app = express();
 
+app.use(cors());
+
 // Set up multer to handle file uploads
 const upload = multer({
-  storage: multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, 'uploads/');
-    },
-    filename: function (req, file, cb) {
-      cb(null, 'recording.webm');
-    },
-  }),
+ storage: multer.memoryStorage()
 });
 
-// Handle POST requests to /api/v1/chat
-app.post('/api/v1/chat', upload.single('audio'), (req, res) => {
+// Handle POST requests to /api/v1/whisper/chat
+app.post('/api/v1/whisper/chat', upload.single('audio'), async (req, res) => {
+  console.log('Whisper version for the API')
   console.log(req.file); // logs information about the uploaded file
 
-  // Do something with the uploaded file, e.g. save it to a database or process it in some way
+  try {
+    // Send the audio file to the Whisper API for transcription
+    const response = await axios.post('https://api.whisper.ai/v1/transcribe', {
+      audio: {
+        data: req.file.buffer.toString('base64'),
+        contentType: 'audio/webm',
+      },
+      language: 'en-US',
+    }, {
+      headers: {
+        Authorization: `Bearer ${process.env.WHISPER_API_KEY}`,
+      },
+    });
 
-  // Set the Access-Control-Allow-Origin header to allow cross-origin requests
-  res.setHeader('Access-Control-Allow-Origin', '*');
+    console.log(response.data.transcription); // logs the transcription returned by the Whisper API
 
-  res.sendStatus(200); // send a response indicating success
+    res.sendStatus(200); // send a response indicating success
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500); // send a response indicating an error occurred
+  }
 });
+
+// Initialize a new SpeechClient object
+const speechClient = new SpeechClient();
+
+// Handle POST requests to /api/v1/google/chat
+app.post('/api/v1/google/chat', upload.single('audio'), async (req, res) => {
+  console.log('Google version for the API')
+  console.log(req.file); // logs information about the uploaded file
+  console.log(req.file.buffer);
+  
+  try {
+    // Send the audio file to the Google Cloud Speech-to-Text API for transcription
+    const audio = {
+      content: req.file.buffer
+    };
+    const config = {
+      encoding: 'WEBM_OPUS',
+      languageCode: 'es-CO',
+    };
+    const request = {
+      audio: audio,
+      config: config,
+    };
+  
+      // Detects speech in the audio file
+    const [response] = await speechClient.recognize(request);
+    console.log(response);
+    console.log(response.results[0].alternatives[0]);
+    const transcription = response.results
+        .map(result => result.alternatives[0].transcript)
+        .join('\n');
+    console.log(`Transcription: ${transcription}`);
+
+    const responseOpenAI = await getResponse(transcription);
+    
+    res.status(200).send({
+      question: transcription,
+      answer: responseOpenAI
+    }); // send a response indicating success
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500); // send a response indicating an error occurred
+  }
+});
+
+async function getResponse(transcription) {
+  const openaiEndpoint = 'https://api.openai.com/v1/engines/davinci-codex/completions';
+  const openaiApiKey = process.env.OPENAI_API_KEY;
+
+  console.log('Requesting: ', transcription)
+
+  const response = await openai.createCompletion({
+    model: 'ada',
+    prompt: transcription,
+    "temperature": 0, 
+    "max_tokens": 30
+  });
+  
+  return response.data.choices[0].text.trim();
+}
 
 // Start the server
 app.listen(3005, () => {

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import TextToSpeech from "../TextToSpeech/TextToSpeech";
 
 interface VoiceRecorderProps {}
 
@@ -15,6 +16,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = () => {
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
     null
   );
+  const [answer, setAnswer] = useState<string>("");
 
   const handleStartRecording = () => {
     setRecording(true);
@@ -31,35 +33,39 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = () => {
       setAudioBlob(audioBlob);
       setAudioURL(audioURL);
       setRecording(false);
+      sendAudio(audioBlob);
     });
     recorder.start();
   };
 
-  const sendAudio = async () => {
-    if (audioBlob) {
-      const formData = new FormData();
-      formData.append("audio", audioBlob, "recording.webm");
+  console.log("Times...");
 
-      try {
-        const response = await fetch("http://localhost:3005/api/v1/chat", {
-          method: "POST",
-          body: formData,
-        });
+  const sendAudio = async (blob: Blob) => {
+    const formData = new FormData();
+    formData.append("audio", blob, "recording.webm");
 
-        if (response.ok) {
-          console.log("Audio sent successfully!");
-        } else {
-          console.log("Failed to send audio.");
-        }
-      } catch (error) {
-        console.error("Failed to send audio:", error);
+    try {
+      const response = await fetch("http://localhost:3005/api/v1/google/chat", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (response.ok) {
+        console.log("Audio sent successfully!");
+
+        const data = await response.json();
+
+        setAnswer(data.answer);
+      } else {
+        console.log("Failed to send audio.");
       }
+    } catch (error) {
+      console.error("Failed to send audio:", error);
     }
   };
 
   const handleStopRecording = () => {
     mediaRecorder?.stop();
-    sendAudio();
   };
 
   useEffect(() => {
@@ -78,11 +84,12 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = () => {
       >
         <span className="text-8xl">🎙</span>
       </button>
-      {audioURL && (
+      {/* {audioURL && (
         <audio controls autoPlay style={{ display: "none" }}>
           <source src={audioURL} />
         </audio>
-      )}
+      )} */}
+      <TextToSpeech text={answer} />
     </div>
   );
 };

@@ -7,7 +7,7 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Tailwind CSS Center Image</title>
+        <title>RIC - AI Assitant (By ChatGPT)</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -16,7 +16,7 @@ export default function Home() {
           <VoiceRecorder></VoiceRecorder>
         </main>
         <footer className="py-8">
-          <h1 className="">AI Assistant with Chat GPT</h1>
+          <h1 className="">RIC - AI Assitant (By ChatGPT)</h1>
         </footer>
       </div>
     </>
