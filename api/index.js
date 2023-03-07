@@ -93,10 +93,7 @@ app.post('/api/v1/google/chat', upload.single('audio'), async (req, res) => {
 });
 
 async function getResponse(transcription) {
-  const openaiEndpoint = 'https://api.openai.com/v1/engines/davinci-codex/completions';
-  const openaiApiKey = process.env.OPENAI_API_KEY;
-
-  console.log('Requesting: ', transcription)
+  console.log('Requesting the next question: ', transcription)
 
   const response = await openai.createCompletion({
     model: 'ada',
